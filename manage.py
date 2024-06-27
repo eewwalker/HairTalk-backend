@@ -1,6 +1,7 @@
 import click
 from flask.cli import FlaskGroup
 from src import create_app, db
+from src.api.users.models import User
 
 app = create_app()
 cli = FlaskGroup(create_app=lambda: app)
@@ -17,6 +18,11 @@ def recreate_db():
 def seed_users_questions_and_replies():
     """Seeds the database with Users, Appointments, and AppointmentReviews."""
     
+    user = User(name="Sarah Darah", location="SF")
+    db.session.add(user)
+    db.session.commit()
+
+    click.echo('added a user')
     # coaches = [
     #     User(name="Immanuel Kant", phone_number="123-456-7890", role="coach"),
     #     User(name="Thomas Hobbes", phone_number="098-765-4321", role="coach"),
@@ -55,7 +61,7 @@ def seed_users_questions_and_replies():
     # db.session.add_all(reviews)
     # db.session.commit()
 
-    click.echo("Database seeded with initial users, comments, and replies.")
+    # click.echo("Database seeded with initial users, comments, and replies.")
 
 if __name__ == "__main__":
     cli()
