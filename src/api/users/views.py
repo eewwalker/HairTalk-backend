@@ -1,4 +1,4 @@
-from urllib import request
+from flask import Flask, request
 from flask_restx import Namespace, Resource, fields
 from .crud import read_users, read_user, create_user, update_user
 users_namespace = Namespace('users')
@@ -27,8 +27,8 @@ class UserList(Resource):
     def post(self):
         try:
             data = request.get_json()
-            name = data['name']
-            location = data['location']
+            name = data.get('name')
+            location = data.get('location')
             user = create_user(name=name, location=location)
             return user, 201
         except ValueError as e:
@@ -38,7 +38,6 @@ class UserList(Resource):
         except Exception as e:
             users_namespace.abort(500, str(e))
 
-users_namespace.add_resource(UserList, '/')
 
 class UserResource(Resource):
     @users_namespace.marshal_with(user_model)
@@ -54,7 +53,7 @@ class UserResource(Resource):
 
     @users_namespace.expect(update_user_model, validate=True)
     @users_namespace.marshal_with(user_model)
-    def put(self, id):
+    def patch(self, id):
         try:
             data = request.get_json()
             name = data.get('name')
@@ -66,6 +65,7 @@ class UserResource(Resource):
         except Exception as e:
             users_namespace.abort(500, str(e))
 
+users_namespace.add_resource(UserList, '/')
 users_namespace.add_resource(UserResource, '/<int:id>')
 
 
