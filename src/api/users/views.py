@@ -1,11 +1,15 @@
 from urllib import request
 from flask_restx import Namespace, Resource, fields
-from .crud import read_users, read_user, create_user
+from .crud import read_users, read_user, create_user, update_user
 users_namespace = Namespace('users')
 
 user_model = users_namespace.model('User',{
     'id': fields.Integer(readOnly=True),
     'name': fields.String(required=True, description='Name of the user', example="John Doe"),
+    'location': fields.String()
+})
+update_user_model = users_namespace.model('User',{
+    'name': fields.String(description='Name of the user', example="John Doe"),
     'location': fields.String()
 })
 
@@ -46,6 +50,20 @@ class UserResource(Resource):
             else:
                 users_namespace.abort(404, f"User id:{id} not found")
         except ValueError as e:
+            users_namespace.abort(500, str(e))
+
+    @users_namespace.expect(update_user_model, validate=True)
+    @users_namespace.marshal_with(user_model)
+    def put(self, id):
+        try:
+            data = request.get_json()
+            name = data.get('name')
+            location = data.get('location')
+            user = update_user(id, name=name, location=location)
+            return user, 200
+        except ValueError as e:
+            users_namespace.abort(400, str(e))
+        except Exception as e:
             users_namespace.abort(500, str(e))
 
 users_namespace.add_resource(UserResource, '/<int:id>')

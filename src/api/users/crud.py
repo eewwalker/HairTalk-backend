@@ -24,3 +24,20 @@ def read_users():
         return User.query.all()
     except Exception as e:
         raise ValueError(f"Error reading users: {e}")
+
+def update_user(id, name=None, location=None):
+    try:
+        user = User.query.filter(User.id == id).first()
+        if user:
+            if name:
+                user.name = name
+            if location:
+                user.location = location
+            db.session.commit()
+            return user
+        else:
+            raise ValueError(f"Error updating user {id}")
+    except Exception as e:
+        db.session.rollback()
+        raise ValueError(f"Error updating user {id}: {e}")
+
