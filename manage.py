@@ -21,9 +21,8 @@ def seed_users_questions_and_replies():
     """Seeds the database with Users, Questions, and Replies."""
 
 
-    user1 = User(name="Sarah Darah", location="SF"),
-    user2 = User(name="Susan Lucci", location="Oakland"),
-
+    user1 = User(name="Sarah Darah", location="SF")
+    user2 = User(name="Susan Lucci", location="Oakland")
     db.session.add_all([user1, user2])
     db.session.commit()
 
@@ -33,23 +32,28 @@ def seed_users_questions_and_replies():
         Question(
             user_id= user1.id,
             content = 'How to cut tight curls?',
-            created_at= datetime(2024,6,24,4,0) ),
+            created_at= datetime(2024,6,24,4,0)
+            ),
         Question(
             user_id= user1.id,
             content = 'What are non toxic color brands?',
-            created_at= datetime(2024,6,24,4,0) ),
+            created_at= datetime(2024,6,24,4,0)
+            ),
         Question(
             user_id= user2.id,
             content = 'Tip or No tip?',
-            created_at= datetime(2024,6,24,4,0) ),
+            created_at= datetime(2024,6,24,4,0)
+            ),
         Question(
             user_id= user1.id,
             content = 'How do you approach a color correction from all over level 10 to level 5?',
-            created_at= datetime(2024,6,24,4,0) ),
+            created_at= datetime(2024,6,24,4,0)
+            ),
     ]
 
-    db.session.add(questions)
+    db.session.add_all(questions)
     db.session.commit()
+    click.echo('added questions')
 
     # students = [
     #     User(name="Charlie Brown", phone_number="111-111-1111", role="student"),
