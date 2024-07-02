@@ -2,6 +2,8 @@ import click
 from flask.cli import FlaskGroup
 from src import create_app, db
 from src.api.users.models import User
+from src.api.questions.models import Question
+from datetime import datetime
 
 app = create_app()
 cli = FlaskGroup(create_app=lambda: app)
@@ -16,34 +18,52 @@ def recreate_db():
 
 @cli.command('seed_users_questions_and_replies')
 def seed_users_questions_and_replies():
-    """Seeds the database with Users, Appointments, and AppointmentReviews."""
-    
-    user = User(name="Sarah Darah", location="SF")
-    db.session.add(user)
+    """Seeds the database with Users, Questions, and Replies."""
+
+
+    user1 = User(name="Sarah Darah", location="SF"),
+    user2 = User(name="Susan Lucci", location="Oakland"),
+
+    db.session.add_all([user1, user2])
     db.session.commit()
 
-    click.echo('added a user')
-    # coaches = [
-    #     User(name="Immanuel Kant", phone_number="123-456-7890", role="coach"),
-    #     User(name="Thomas Hobbes", phone_number="098-765-4321", role="coach"),
-    #     User(name="Lao Tzu", phone_number="555-555-5555", role="coach"),
-    #     User(name="Hannah Arendt", phone_number="444-444-4444", role="coach")
-    # ]
-    
+    click.echo('added users')
+
+    questions = [
+        Question(
+            user_id= user1.id,
+            content = 'How to cut tight curls?',
+            created_at= datetime(2024,6,24,4,0) ),
+        Question(
+            user_id= user1.id,
+            content = 'What are non toxic color brands?',
+            created_at= datetime(2024,6,24,4,0) ),
+        Question(
+            user_id= user2.id,
+            content = 'Tip or No tip?',
+            created_at= datetime(2024,6,24,4,0) ),
+        Question(
+            user_id= user1.id,
+            content = 'How do you approach a color correction from all over level 10 to level 5?',
+            created_at= datetime(2024,6,24,4,0) ),
+    ]
+
+    db.session.add(questions)
+    db.session.commit()
+
     # students = [
     #     User(name="Charlie Brown", phone_number="111-111-1111", role="student"),
     #     User(name="Lucy van Pelt", phone_number="222-222-2222", role="student"),
     #     User(name="Linus van Pelt", phone_number="333-333-3333", role="student"),
     #     User(name="Sally Brown", phone_number="444-444-4444", role="student")
     # ]
-    
-    # db.session.add_all(coaches + students)
+    #db.session.add_all(coaches + students )
     # db.session.commit()
-    
+
     # start_date = datetime(2024, 5, 1)
     # end_date = datetime(2024, 8, 31)
     # delta_days = (end_date - start_date).days
-    
+
     # appointments = []
     # reviews = []
 
@@ -55,7 +75,7 @@ def seed_users_questions_and_replies():
     #             appointment_time = datetime.combine(appointment_date, datetime.min.time()) + timedelta(hours=random.randint(9, 17))
     #             appointment = Appointment(coach_id=coach.id, start_time=appointment_time, student_id=random.choice([student.id, None]))
     #             appointments.append(appointment)
-    
+
     # db.session.add_all(appointments)
     # db.session.commit()
     # db.session.add_all(reviews)
