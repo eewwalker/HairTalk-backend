@@ -15,6 +15,30 @@ def create_question(user_id, content, created_at):
         raise ValueError(f"Error creating question: {e}")
 
 
+def create_answer(user_id, question_id, content):
+    try:
+        answer = Answer(user_id=user_id,
+                        question_id=question_id, content=content)
+        db.session.add(answer)
+        db.session.commit()
+        return answer
+    except Exception as e:
+        db.session.rollback()
+        raise ValueError(f"Error creating answer: {e}")
+
+
+def create_comment(user_id, answer_id, content):
+    try:
+        comment = Comment(
+            user_id=user_id, answer_id=answer_id, content=content)
+        db.session.add(comment)
+        db.session.commit()
+        return comment
+    except Exception as e:
+        db.session.rollback()
+        raise ValueError(f"Error creating comment: {e}")
+
+
 def read_question(id):
     try:
         return Question.query.filter(Question.id == id).first()
