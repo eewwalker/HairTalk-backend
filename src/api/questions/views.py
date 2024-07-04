@@ -1,34 +1,9 @@
-from flask import Flask, request
-from flask_restx import Namespace, Resource, fields
-from .crud import create_question, read_question, read_questions, read_conversation
-
-questions_namespace = Namespace('questions')
-
-question_model = questions_namespace.model('Question', {
-    'id': fields.Integer(readOnly=True),
-    'user_id': fields.Integer(required=True, description='Id attached to user', example="1"),
-    'content': fields.String(),
-    'created_at': fields.Date()
-})
-
-conversation_model = questions_namespace.model('Conversation', {
-    'id': fields.Integer(readOnly=True),
-    'user_id': fields.Integer,
-    'content': fields.String,
-    'created_at': fields.DateTime,
-    'answers': fields.List(fields.Nested(questions_namespace.model('Answer', {
-        'id': fields.Integer,
-        'user_id': fields.Integer,
-        'content': fields.String,
-        'created_at': fields.DateTime,
-        'comments': fields.List(fields.Nested(questions_namespace.model('Comment', {
-            'id': fields.Integer,
-            'user_id': fields.Integer,
-            'content': fields.String,
-            'created_at': fields.DateTime
-        })))
-    })))
-})
+from flask import request
+from flask_restx import Resource
+from .crud import (create_question, read_question, read_questions,
+                   read_conversation, create_answer, create_comment)
+from .schemas import (questions_namespace, question_model, answer_model_marshal, answer_model_validate,
+                      comment_model_marshal, comment_model_validate, conversation_model)
 
 
 class QuestionList(Resource):
@@ -63,14 +38,15 @@ class QuestionList(Resource):
 
 
 class QuestionResource(Resource):
-    @questions_namespace.marshal_list_with(question_model)
+    @questions_namespace.marshal_with(question_model)
     def get(self, id):
         try:
             question = read_question(id)
             if question:
                 return question, 200
             else:
-                questions_namespace.abort(404, f"User id:{id} not found")
+                questions_namespace.abort(
+                    404, f"Question with id {id} not found")
         except ValueError as e:
             questions_namespace.abort(500, str(e))
 
@@ -80,13 +56,57 @@ class ConversationResource(Resource):
     def get(self, question_id):
         try:
             conversation = read_conversation(question_id)
-            print('conversation', conversation)
             if conversation:
                 return conversation, 200
             else:
                 questions_namespace.abort(
-                    404, f"Question with id {question_id} not found")
+                    404, f"Question with id {id} not found")
         except ValueError as e:
+            questions_namespace.abort(500, str(e))
+
+
+class AnswerList(Resource):
+    @questions_namespace.expect(answer_model_validate, validate=True)
+    @questions_namespace.marshal_with(answer_model_marshal, code=201)
+    def post(self, question_id):
+        try:
+            data = request.get_json()
+            user_id = data.get('user_id')
+            content = data.get('content')
+            answer = create_answer(
+                user_id=user_id,
+                question_id=question_id,
+                content=content
+            )
+            return answer, 201
+        except ValueError as e:
+            questions_namespace.abort(400, str(e))
+        except KeyError as e:
+            questions_namespace.abort(400, f"Missing field: {e}")
+        except Exception as e:
+            questions_namespace.abort(500, str(e))
+
+
+class CommentList(Resource):
+    @questions_namespace.expect(comment_model_validate, validate=True)
+    @questions_namespace.marshal_with(comment_model_marshal, code=201)
+    def post(self, question_id, answer_id):
+        try:
+            data = request.get_json()
+            user_id = data.get('user_id')
+            answer_id = answer_id
+            content = data.get('content')
+            comment = create_comment(
+                user_id=user_id,
+                answer_id=answer_id,
+                content=content
+            )
+            return comment, 201
+        except ValueError as e:
+            questions_namespace.abort(400, str(e))
+        except KeyError as e:
+            questions_namespace.abort(400, f"Missing field: {e}")
+        except Exception as e:
             questions_namespace.abort(500, str(e))
 
 
@@ -94,3 +114,6 @@ questions_namespace.add_resource(QuestionList, '/')
 questions_namespace.add_resource(QuestionResource, '/<int:id>')
 questions_namespace.add_resource(
     ConversationResource, '/<int:question_id>/conversation')
+questions_namespace.add_resource(AnswerList, '/<int:question_id>/answers')
+questions_namespace.add_resource(
+    CommentList, '/<int:question_id>/answers/<int:answer_id>/comments')
