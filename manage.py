@@ -2,11 +2,13 @@ import click
 from flask.cli import FlaskGroup
 from src import create_app, db
 from src.api.users.models import User
-from src.api.questions.models import Question
+from src.api.questions.models import Question, Answer, Comment
 from datetime import datetime
+import random
 
 app = create_app()
 cli = FlaskGroup(create_app=lambda: app)
+
 
 @cli.command('recreate_db')
 def recreate_db():
@@ -16,76 +18,79 @@ def recreate_db():
     db.session.commit()
     click.echo("Database recreated!")
 
+
 @cli.command('seed_users_questions_and_replies')
 def seed_users_questions_and_replies():
     """Seeds the database with Users, Questions, and Replies."""
 
-
     user1 = User(name="Sarah Darah", location="SF")
     user2 = User(name="Susan Lucci", location="Oakland")
-    db.session.add_all([user1, user2])
+    user3 = User(name="Sebastian Creastion", location="Brooklyn")
+    user4 = User(name="Emily Engles", location="Queens")
+    db.session.add_all([user1, user2, user3, user4])
     db.session.commit()
 
     click.echo('added users')
 
     questions = [
         Question(
-            user_id= user1.id,
-            content = 'How to cut tight curls?',
-            created_at= datetime(2024,6,24,4,0)
-            ),
+            user_id=user1.id,
+            content='How to cut tight curls?',
+            created_at=datetime(2024, 6, 24, 4, 0)
+        ),
         Question(
-            user_id= user1.id,
-            content = 'What are non toxic color brands?',
-            created_at= datetime(2024,6,24,4,0)
-            ),
+            user_id=user1.id,
+            content='What are non toxic color brands?',
+            created_at=datetime(2024, 6, 24, 4, 0)
+        ),
         Question(
-            user_id= user2.id,
-            content = 'Tip or No tip?',
-            created_at= datetime(2024,6,24,4,0)
-            ),
+            user_id=user2.id,
+            content='Tip or No tip?',
+            created_at=datetime(2024, 6, 24, 4, 0)
+        ),
         Question(
-            user_id= user1.id,
-            content = 'How do you approach a color correction from all over level 10 to level 5?',
-            created_at= datetime(2024,6,24,4,0)
-            ),
+            user_id=user1.id,
+            content='How do you approach a color correction from all over level 10 to level 5?',
+            created_at=datetime(2024, 6, 24, 4, 0)
+        ),
     ]
 
     db.session.add_all(questions)
     db.session.commit()
     click.echo('added questions')
 
-    # students = [
-    #     User(name="Charlie Brown", phone_number="111-111-1111", role="student"),
-    #     User(name="Lucy van Pelt", phone_number="222-222-2222", role="student"),
-    #     User(name="Linus van Pelt", phone_number="333-333-3333", role="student"),
-    #     User(name="Sally Brown", phone_number="444-444-4444", role="student")
-    # ]
-    #db.session.add_all(coaches + students )
-    # db.session.commit()
+    answers = []
+    for question in questions:
+        for i in range(random.randint(1, 3)):
+            answer = Answer(
+                user_id=random.choice(
+                    [user1.id, user2.id, user3.id, user4.id]),
+                question_id=question.id,
+                content=f'Answer {i + 1} for question {question.id}',
+                created_at=datetime(2024, 6, 24, 5, 0 + i)
+            )
+            answers.append(answer)
 
-    # start_date = datetime(2024, 5, 1)
-    # end_date = datetime(2024, 8, 31)
-    # delta_days = (end_date - start_date).days
+    db.session.add_all(answers)
+    db.session.commit()
+    click.echo('added answers')
 
-    # appointments = []
-    # reviews = []
+    comments = []
+    for answer in answers:
+        for j in range(random.randint(0, 3)):
+            comment = Comment(
+                user_id=random.choice(
+                    [user1.id, user2.id, user3.id, user4.id]),
+                answer_id=answer.id,
+                content=f'Comment {j + 1} for answer {answer.id}',
+                created_at=datetime(2024, 6, 24, 7, 0 + j)
+            )
+            comments.append(comment)
 
-    # for coach in coaches:
-    #     for student in students:
-    #         for _ in range(2):
-    #             days_offset = random.randint(0, delta_days)
-    #             appointment_date = start_date + timedelta(days=days_offset)
-    #             appointment_time = datetime.combine(appointment_date, datetime.min.time()) + timedelta(hours=random.randint(9, 17))
-    #             appointment = Appointment(coach_id=coach.id, start_time=appointment_time, student_id=random.choice([student.id, None]))
-    #             appointments.append(appointment)
+    db.session.add_all(comments)
+    db.session.commit()
+    click.echo('added comments')
 
-    # db.session.add_all(appointments)
-    # db.session.commit()
-    # db.session.add_all(reviews)
-    # db.session.commit()
-
-    # click.echo("Database seeded with initial users, comments, and replies.")
 
 if __name__ == "__main__":
     cli()
