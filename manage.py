@@ -23,10 +23,10 @@ def recreate_db():
 def seed_users_questions_and_replies():
     """Seeds the database with Users, Questions, and Replies."""
 
-    user1 = User(name="Sarah Darah", location="SF")
-    user2 = User(name="Susan Lucci", location="Oakland")
-    user3 = User(name="Sebastian Creastion", location="Brooklyn")
-    user4 = User(name="Emily Engles", location="Queens")
+    user1 = User(username="Sarah Darah", location="SF")
+    user2 = User(username="Susan Lucci", location="Oakland")
+    user3 = User(username="Sebastian Creastion", location="Brooklyn")
+    user4 = User(username="Emily Engles", location="Queens")
     db.session.add_all([user1, user2, user3, user4])
     db.session.commit()
 

@@ -9,7 +9,7 @@ class User(db.Model):
         primary_key= True
         )
 
-    name = db.Column(
+    username = db.Column(
         db.String(),
         nullable=False
         )
@@ -18,8 +18,8 @@ class User(db.Model):
         db.String()
         )
 
-    def __init__(self, name, location):
-        self.name = name
+    def __init__(self, username, location):
+        self.username = username
         self.location = location
 
 

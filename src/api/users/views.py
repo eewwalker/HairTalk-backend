@@ -5,11 +5,11 @@ users_namespace = Namespace('users')
 
 user_model = users_namespace.model('User',{
     'id': fields.Integer(readOnly=True),
-    'name': fields.String(required=True, description='Name of the user', example="John Doe"),
+    'username': fields.String(required=True, description='Username for user', example="John Doe"),
     'location': fields.String()
 })
 update_user_model = users_namespace.model('User',{
-    'name': fields.String(description='Name of the user', example="John Doe"),
+    'username': fields.String(description='Username for user', example="John Doe"),
     'location': fields.String()
 })
 
@@ -27,9 +27,9 @@ class UserList(Resource):
     def post(self):
         try:
             data = request.get_json()
-            name = data.get('name')
+            username = data.get('username')
             location = data.get('location')
-            user = create_user(name=name, location=location)
+            user = create_user(username=username, location=location)
             return user, 201
         except ValueError as e:
             users_namespace.abort(400, str(e))
@@ -56,9 +56,9 @@ class UserResource(Resource):
     def patch(self, id):
         try:
             data = request.get_json()
-            name = data.get('name')
+            username = data.get('username')
             location = data.get('location')
-            user = update_user(id, name=name, location=location)
+            user = update_user(id, username=username, location=location)
             return user, 200
         except ValueError as e:
             users_namespace.abort(400, str(e))

@@ -2,9 +2,9 @@ from src import db
 from sqlalchemy.exc import IntegrityError
 from .models import User
 
-def create_user(name, location):
+def create_user(username, location):
     try:
-        user = User(name=name, location=location)
+        user = User(username=username, location=location)
         db.session.add(user)
         db.session.commit()
         return user
@@ -25,12 +25,12 @@ def read_users():
     except Exception as e:
         raise ValueError(f"Error reading users: {e}")
 
-def update_user(id, name=None, location=None):
+def update_user(id, username=None, location=None):
     try:
         user = User.query.filter(User.id == id).first()
         if user:
-            if name:
-                user.name = name
+            if username:
+                user.username = username
             if location:
                 user.location = location
             db.session.commit()
