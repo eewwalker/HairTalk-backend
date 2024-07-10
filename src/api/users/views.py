@@ -1,11 +1,13 @@
-from flask import Flask, request
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from .crud import read_users, read_user, create_user, update_user
+
 users_namespace = Namespace('users')
 
 user_model = users_namespace.model('User',{
     'id': fields.Integer(readOnly=True),
     'username': fields.String(required=True, description='Username for user', example="John Doe"),
+    'password': fields.String(required=True, description='Password for user'),
     'location': fields.String()
 })
 update_user_model = users_namespace.model('User',{
@@ -20,7 +22,7 @@ class UserList(Resource):
             users = read_users()
             return users, 200
         except ValueError as e:
-            users_namespace.abort(500, str(e))
+            return {'message': str(e)}, 500
 
     @users_namespace.expect(user_model, validate=True)
     @users_namespace.marshal_with(user_model, code=201)
@@ -32,11 +34,14 @@ class UserList(Resource):
             user = create_user(username=username, location=location)
             return user, 201
         except ValueError as e:
-            users_namespace.abort(400, str(e))
+            return {'message': str(e)}, 400
+            # users_namespace.abort(400, str(e))
         except KeyError as e:
-            users_namespace.abort(400, f"Missing field: {e}")
+            return {'message': f"Missing field: {e}"}, 400
+            # users_namespace.abort(400, f"Missing field: {e}")
         except Exception as e:
-            users_namespace.abort(500, str(e))
+            return {'message': str(e)}, 500
+            # users_namespace.abort(500, str(e))
 
 
 class UserResource(Resource):
@@ -47,9 +52,11 @@ class UserResource(Resource):
             if user:
                 return user, 200
             else:
-                users_namespace.abort(404, f"User id:{id} not found")
+                return {'message': f"User id:{id} not found"}, 404
+                # users_namespace.abort(404, f"User id:{id} not found")
         except ValueError as e:
-            users_namespace.abort(500, str(e))
+            return {'message': str(e)}, 500
+            # users_namespace.abort(500, str(e))
 
     @users_namespace.expect(update_user_model, validate=True)
     @users_namespace.marshal_with(user_model)
@@ -61,9 +68,11 @@ class UserResource(Resource):
             user = update_user(id, username=username, location=location)
             return user, 200
         except ValueError as e:
-            users_namespace.abort(400, str(e))
+            return {'message': str(e)}, 400
+            # users_namespace.abort(400, str(e))
         except Exception as e:
-            users_namespace.abort(500, str(e))
+            return {'message': str(e)}, 500
+            # users_namespace.abort(500, str(e))
 
 users_namespace.add_resource(UserList, '/')
 users_namespace.add_resource(UserResource, '/<int:id>')

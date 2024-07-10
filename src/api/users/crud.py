@@ -1,10 +1,9 @@
 from src import db
-from sqlalchemy.exc import IntegrityError
 from .models import User
 
-def create_user(username, location):
+def create_user(username,password, location):
     try:
-        user = User(username=username, location=location)
+        user = User(username=username, password=password, location=location)
         db.session.add(user)
         db.session.commit()
         return user
