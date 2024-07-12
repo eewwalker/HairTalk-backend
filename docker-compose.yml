@@ -11,18 +11,19 @@ services:
     ports:
       - 5004:5000
     environment:
-      - FLASK_APP=manage.py
-      - FLASK_DEBUG=1
-      - FLASK_ENV=development
-      - APP_SETTINGS=src.config.Config
-      - DATABASE_URL=postgresql://postgres:postgres@api-dev-db:5432/api_dev
-      - DATABASE_TEST_URL=postgresql://postgres:postgres@api-test-db:5432/api_test
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - FLASK_ENV=${FLASK_ENV}
+      - APP_SETTINGS=${APP_SETTINGS}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_TEST_URL=${DATABASE_TEST_URL}
       - SHARED_SECRET_KEY=${SHARED_SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
 
     depends_on:
       - api-dev-db
       - api-test-db
-    
+
   api-dev-db:
     build:
       context: ./src/db
@@ -30,8 +31,8 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
   api-test-db:
     build:
@@ -40,6 +41,6 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
