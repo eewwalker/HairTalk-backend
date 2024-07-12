@@ -4,7 +4,9 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
 
+load_dotenv()
 
 db = SQLAlchemy()
 cors = CORS()
@@ -26,6 +28,14 @@ def create_app(config=None, script_info=None):
             database_url = database_url.replace(
                 "postgres://", "postgresql://", 1)
         app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
+    #JWT config
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+    app.config['JWT_REFRESH_COOKIE_PATH'] = '/auth/refresh'
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+    app.config['JWT_COOKIE_SECURE'] = False  # Set to True in production if using HTTPS
 
     # Initialize extensions
     db.init_app(app)
