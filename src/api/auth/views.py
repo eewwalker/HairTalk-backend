@@ -1,7 +1,7 @@
-from flask import request
+from flask import request, jsonify
 from flask_restx import Resource, Namespace
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies
 from src.api.users.models import User
 from ..users.crud import read_users, create_user
 from ..users.views import user_model
@@ -47,7 +47,10 @@ class Login(Resource):
                 return {'message': 'Invalid credentials'}, 401
 
             access_token = create_access_token(identity=username)
-            return {'access_token': access_token}, 200
+            response = jsonify({'message': 'Login successsful'})
+            set_access_cookies(response, access_token)
+            
+            return response, 200
 
         except ValueError as e:
             return {'message': str(e)}, 500
