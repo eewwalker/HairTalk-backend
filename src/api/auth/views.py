@@ -46,10 +46,10 @@ class Login(Resource):
             if not user or not bcrypt.check_password_hash(user.password, password):
                 return {'message': 'Invalid credentials'}, 401
 
-            access_token = create_access_token(identity=username)
+            access_token = create_access_token(identity={"user_id": user.id, "username": user.username})
             response = jsonify({'message': 'Login successsful'})
             set_access_cookies(response, access_token)
-            
+
             return response, 200
 
         except ValueError as e:
