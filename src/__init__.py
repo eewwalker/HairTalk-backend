@@ -35,7 +35,7 @@ def create_app(config=None, script_info=None):
     app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
     app.config['JWT_REFRESH_COOKIE_PATH'] = '/auth/refresh'
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-    app.config['JWT_COOKIE_SECURE'] = False  # Set to True in production if using HTTPS
+    app.config['JWT_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
 
     # Initialize extensions
     db.init_app(app)
