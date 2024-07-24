@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_restx import Resource, Namespace
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies
@@ -47,10 +47,10 @@ class Login(Resource):
                 return {'message': 'Invalid credentials'}, 401
 
             access_token = create_access_token(identity={"user_id": user.id, "username": user.username})
-            response = jsonify({'message': 'Login successsful'})
+            response = make_response(jsonify({'message': 'Login successsful'}), 200)
             set_access_cookies(response, access_token)
 
-            return response, 200
+            return response
 
         except ValueError as e:
             return {'message': str(e)}, 500
@@ -67,6 +67,16 @@ class Protected(Resource):
         except Exception as e:
             return {'message': f'An unexpected error occurred: {e}'}, 500
 
+class VerifyToken(Resource):
+    @jwt_required()
+    def get(self):
+        try:
+            current_user = get_jwt_identity()
+            return {'logged_in_as': current_user}, 200
+        except Exception as e:
+            return {'message': f'An unexpected error occurred: {e}'}, 500
+
 auth_namespace.add_resource(Register, '/register')
 auth_namespace.add_resource(Login, '/login')
 auth_namespace.add_resource(Protected, '/protected')
+auth_namespace.add_resource(VerifyToken, '/verify_token')
