@@ -47,7 +47,16 @@ class Login(Resource):
                 return {'message': 'Invalid credentials'}, 401
 
             access_token = create_access_token(identity={"user_id": user.id, "username": user.username})
-            response = make_response(jsonify({'message': 'Login successsful'}), 200)
+            response_data = {
+                'message': 'Login successful',
+                'access_token': access_token,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'location': user.location
+                }
+            }
+            response = make_response(jsonify(response_data), 200)
             set_access_cookies(response, access_token)
 
             return response
