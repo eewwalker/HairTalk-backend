@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_restx import Resource, Namespace
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -42,9 +42,12 @@ class Login(Resource):
             username = data.get('username')
             password = data.get('password')
 
+            print(f"Received login request for username: {username}")
+
             user = User.query.filter_by(username=username).first()
             if not user or not bcrypt.check_password_hash(user.password, password):
-                return {'message': 'Invalid credentials'}, 401
+                print(f"Invalid credentials")
+                return make_response(jsonify({'message': 'Invalid credentials'}), 401)
 
             response_data = {
                 'message': 'Login successful',
@@ -55,12 +58,14 @@ class Login(Resource):
                 }
             }
 
-            return jsonify(response_data), 200
+            return make_response(jsonify(response_data), 200)
 
         except ValueError as e:
-            return {'message': str(e)}, 500
+            print(f"An error occurred: {str(e)}")
+            return make_response({'message': str(e)}, 500)
         except Exception as e:
-            return {'message': f"An unexpected error occurred: {e}"}, 500
+            print(f"An unexpected error occurred: {str(e)}")
+            return make_response({'message': f"An unexpected error occurred: {e}"}, 500)
 
 
 class Protected(Resource):
