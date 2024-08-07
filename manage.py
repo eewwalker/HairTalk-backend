@@ -5,9 +5,11 @@ from src.api.users.models import User
 from src.api.questions.models import Question, Answer, Comment
 from datetime import datetime
 import random
+from flask_bcrypt import Bcrypt
 
 app = create_app()
 cli = FlaskGroup(create_app=lambda: app)
+bcrypt = Bcrypt(app)
 
 
 @cli.command('recreate_db')
@@ -23,10 +25,26 @@ def recreate_db():
 def seed_users_questions_and_replies():
     """Seeds the database with Users, Questions, and Replies."""
 
-    user1 = User(username="Sarah Darah", password='password', location="SF")
-    user2 = User(username="Susan Lucci", password='password', location="Oakland")
-    user3 = User(username="Sebastian Creastion", password='password', location="Brooklyn")
-    user4 = User(username="Emily Engles", password='password', location="Queens")
+    user1 = User(
+        username="Sarah Darah",
+        password=bcrypt.generate_password_hash('password').decode('utf-8'),
+        location="SF"
+        )
+    user2 = User(
+        username="Susan Lucci",
+        password=bcrypt.generate_password_hash('password').decode('utf-8'),
+        location="Oakland"
+        )
+    user3 = User(
+        username="Sebastian Creastion",
+        password=bcrypt.generate_password_hash('password').decode('utf-8'),
+        location="Brooklyn"
+        )
+    user4 = User(
+        username="Emily Engles",
+        password=bcrypt.generate_password_hash('password').decode('utf-8'),
+        location="Queens"
+        )
     db.session.add_all([user1, user2, user3, user4])
     db.session.commit()
 
