@@ -1,7 +1,7 @@
-from flask import request, jsonify, make_response
+from flask import request, jsonify
 from flask_restx import Resource, Namespace
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.api.users.models import User
 from ..users.crud import read_users, create_user
 from ..users.views import user_model
@@ -46,20 +46,16 @@ class Login(Resource):
             if not user or not bcrypt.check_password_hash(user.password, password):
                 return {'message': 'Invalid credentials'}, 401
 
-            access_token = create_access_token(identity={"user_id": user.id, "username": user.username})
             response_data = {
                 'message': 'Login successful',
-                'access_token': access_token,
                 'user': {
                     'id': user.id,
                     'username': user.username,
                     'location': user.location
                 }
             }
-            response = make_response(jsonify(response_data), 200)
-            set_access_cookies(response, access_token)
 
-            return response
+            return jsonify(response_data), 200
 
         except ValueError as e:
             return {'message': str(e)}, 500
