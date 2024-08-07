@@ -1,11 +1,16 @@
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 from src import db
 
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(
-        db.Integer,
-        primary_key= True
+        UUID(as_uuid=True),
+        primary_key= True,
+        default=uuid.uuid4,
+        unique=True,
+        nullable=False
     )
 
     username = db.Column(

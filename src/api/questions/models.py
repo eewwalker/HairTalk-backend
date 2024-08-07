@@ -1,3 +1,5 @@
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 from src import db
 from datetime import datetime
 
@@ -11,7 +13,7 @@ class Question(db.Model):
     )
 
     user_id = db.Column(
-        db.Integer,
+        UUID(as_uuid=True),
         db.ForeignKey('users.id'),
         nullable=False
     )
@@ -42,7 +44,7 @@ class Answer(db.Model):
     )
 
     user_id = db.Column(
-        db.Integer,
+        UUID(as_uuid=True),
         db.ForeignKey('users.id'),
         nullable=False)
 
@@ -82,7 +84,7 @@ class Comment(db.Model):
     )
 
     user_id = db.Column(
-        db.Integer,
+        UUID(as_uuid=True),
         db.ForeignKey('users.id'),
         nullable=False
     )
