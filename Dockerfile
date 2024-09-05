@@ -1,10 +1,12 @@
-# pull official base image
+# pull official base Docker image containing Python envrn
 FROM python:3.11.2-slim-buster
 
-# set working directory
+# set working directory inside container
 WORKDIR /usr/src/app
 
 # set environment variables
+#Prevents Python from writing .pyc files to disc.
+#Ensures Python output is sent straight to terminal without being buffered.
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
@@ -14,7 +16,7 @@ RUN apt-get update \
   && apt-get clean
 
 
-# add and install requirements
+# copy(from local to container)and install requirements
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 

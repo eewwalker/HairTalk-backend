@@ -7,6 +7,7 @@ from datetime import datetime
 import random
 from flask_bcrypt import Bcrypt
 
+#create Flask app
 app = create_app()
 cli = FlaskGroup(create_app=lambda: app)
 bcrypt = Bcrypt(app)
