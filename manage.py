@@ -27,24 +27,24 @@ def seed_users_questions_and_replies():
     """Seeds the database with Users, Questions, and Replies."""
 
     user1 = User(
-        username="Sarah Darah",
+        username="sarahdarah",
         password=bcrypt.generate_password_hash('password').decode('utf-8'),
-        location="SF"
+        location="San Francisco, California"
         )
     user2 = User(
-        username="Susan Lucci",
+        username="susanlucci",
         password=bcrypt.generate_password_hash('password').decode('utf-8'),
-        location="Oakland"
+        location="Oakland, California"
         )
     user3 = User(
-        username="Sebastian Creastion",
+        username="sebastiancreastion",
         password=bcrypt.generate_password_hash('password').decode('utf-8'),
-        location="Brooklyn"
+        location="Brooklyn, New York"
         )
     user4 = User(
-        username="Emily Engles",
+        username="emilyengles",
         password=bcrypt.generate_password_hash('password').decode('utf-8'),
-        location="Queens"
+        location="Queens, New York"
         )
     db.session.add_all([user1, user2, user3, user4])
     db.session.commit()
