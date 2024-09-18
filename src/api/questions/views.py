@@ -21,10 +21,12 @@ class QuestionList(Resource):
         try:
             data = request.get_json()
             user_id = data.get('user_id')
+            title = data.get('title')
             content = data.get('content')
             created_at = data.get('created_at')
             question = create_question(
                 user_id=user_id,
+                title=title,
                 content=content,
                 created_at=created_at
             )

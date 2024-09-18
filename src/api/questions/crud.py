@@ -1,11 +1,11 @@
 from src import db
-from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.exc import IntegrityError
 from .models import Question, Answer, Comment
 
 
-def create_question(user_id, content, created_at):
+def create_question(user_id, title, content, created_at):
     try:
-        question = Question(user_id=user_id, content=content,
+        question = Question(user_id=user_id, title=title, content=content,
                             created_at=created_at)
         db.session.add(question)
         db.session.commit()

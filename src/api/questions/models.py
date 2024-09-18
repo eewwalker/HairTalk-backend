@@ -17,6 +17,11 @@ class Question(db.Model):
         nullable=False
     )
 
+    title = db.Column(
+        db.Text,
+        nullable=False
+    )
+
     content = db.Column(
         db.Text,
         nullable=False
@@ -28,8 +33,9 @@ class Question(db.Model):
         nullable=False
     )
 
-    def __init__(self, user_id, content, created_at=None):
+    def __init__(self, user_id, title, content, created_at=None):
         self.user_id = user_id
+        self.title = title
         self.content = content
         self.created_at = created_at if created_at else datetime.now()
 

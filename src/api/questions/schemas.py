@@ -4,6 +4,7 @@ questions_namespace = Namespace('questions')
 
 question_model = questions_namespace.model('Question', {
     'id': fields.Integer(readOnly=True),
+    'title': fields.String(),
     'user_id': fields.Integer(required=True, description='Id attached to user', example="1"),
     'content': fields.String(),
     'created_at': fields.Date()

@@ -54,22 +54,26 @@ def seed_users_questions_and_replies():
     questions = [
         Question(
             user_id=user1.id,
-            content='How to cut tight curls?',
+            title='How to cut tight curls?',
+            content='Content for question How to cut tight curls?',
             created_at=datetime(2024, 6, 24, 4, 0)
         ),
         Question(
             user_id=user1.id,
-            content='What are non toxic color brands?',
+            title='What are non toxic color brands?',
+            content='Content for question What are non toxic color brands?',
             created_at=datetime(2024, 6, 24, 4, 0)
         ),
         Question(
             user_id=user2.id,
-            content='Tip or No tip?',
+            title='Tip or No tip',
+            content='Content for Tip or No tip?',
             created_at=datetime(2024, 6, 24, 4, 0)
         ),
         Question(
             user_id=user1.id,
-            content='How do you approach a color correction from all over level 10 to level 5?',
+            title='How do you approach a color correction from all over level 10 to level 5?',
+            content='Content for How do you approach a color correction from all over level 10 to level 5?',
             created_at=datetime(2024, 6, 24, 4, 0)
         ),
     ]
