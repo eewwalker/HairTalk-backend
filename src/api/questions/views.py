@@ -1,17 +1,32 @@
 from flask import request
-from flask_restx import Resource
+from flask_restx import Resource, reqparse
 from .crud import (create_question, read_question, read_questions,
                    read_conversation, create_answer, create_comment)
 from .schemas import (questions_namespace, question_model, answer_model_marshal, answer_model_validate,
-                      comment_model_marshal, comment_model_validate, conversation_model)
-
+                      comment_model_marshal, comment_model_validate, conversation_model, pagination_model)
 
 class QuestionList(Resource):
-    @questions_namespace.marshal_list_with(question_model)
+    parser = reqparse.RequestParser()
+    parser.add_argument('page', type=int, default=1, help='Page number')
+    parser.add_argument('per_page', type=int,
+                        default=20, help="Items per page")
+
+    @questions_namespace.marshal_list_with(pagination_model)
     def get(self):
+        args = self.parser.parse_args()
+        page = args['page']
+        per_page = args['per_page']
+
         try:
-            questions = read_questions()
-            return questions, 200
+            questions = read_questions(page=page, per_page=per_page)
+
+            return {
+                'items': questions.items,
+                'total': questions.total,
+                'pages': questions.pages,
+                'current_page': questions.page
+            }, 200
+
         except ValueError as e:
             questions_namespace.abort(500, str(e))
 

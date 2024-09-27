@@ -1,6 +1,7 @@
 from src import db
 # from sqlalchemy.exc import IntegrityError
 from .models import Question, Answer, Comment
+from sqlalchemy import desc
 
 
 def create_question(user_id, title, content, created_at):
@@ -46,9 +47,10 @@ def read_question(id):
         raise ValueError(f"Error reading question {id}: {e}")
 
 
-def read_questions():
+def read_questions(page=1, per_page=20):
     try:
-        return Question.query.all()
+        return Question.query.order_by(desc(Question.created_at)).\
+                        paginate(page=page, per_page=per_page, error_out=False)
     except Exception as e:
         raise ValueError(f"Error reading questions: {e}")
 
