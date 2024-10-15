@@ -2,6 +2,27 @@ from sqlalchemy.dialects.postgresql import UUID
 from src import db
 from datetime import datetime
 
+# Association table for the many-to-many relationship between Question and Tag
+question_tags = db.Table('question_tags',
+    db.Column('question_id', db.Integer, db.ForeignKey('questions.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
+class Tags(db.Model):
+    __tablename__= "tags"
+
+    id = db.Column(
+        db.Integer(),
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.Text,
+        unique=True,
+        nullable=False
+    )
+
+    def __init__(self, name):
+        self.name=name
 
 class Question(db.Model):
     __tablename__ = "questions"
@@ -32,6 +53,8 @@ class Question(db.Model):
         default=db.func.current_timestamp(),
         nullable=False
     )
+
+    tags = db.relationship('Tag', secondary=question_tags, backref=db.backref('questions', lazy='dynamic'))
 
     def __init__(self, user_id, title, content, created_at=None):
         self.user_id = user_id
@@ -115,3 +138,7 @@ class Comment(db.Model):
         self.answer_id = answer_id
         self.content = content
         self.created_at = created_at if created_at else datetime.now()
+
+
+
+
