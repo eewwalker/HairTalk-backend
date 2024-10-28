@@ -4,7 +4,7 @@ from .crud import (create_question, read_question, read_questions,
                    read_conversation, create_answer, create_comment)
 from .schemas import (questions_namespace, question_model, answer_model_marshal, answer_model_validate,
                       comment_model_marshal, comment_model_validate, conversation_model, pagination_model)
-
+from ...utils.uuid_utils import parse_uuid
 class QuestionList(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('page', type=int, default=1, help='Page number')
@@ -33,18 +33,18 @@ class QuestionList(Resource):
     @questions_namespace.expect(question_model, validate=True)
     @questions_namespace.marshal_with(question_model, code=201)
     def post(self):
+        print("Received request") # Debug log
         try:
             data = request.get_json()
-            user_id = data.get('user_id')
-            title = data.get('title')
-            content = data.get('content')
-            created_at = data.get('created_at')
+            print("Request data:", data) # Debug log
+
             question = create_question(
-                user_id=user_id,
-                title=title,
-                content=content,
-                created_at=created_at
+                user_id=parse_uuid(data.get('userId')),
+                title=data.get('title'),
+                content=data.get('content'),
+                tag_names=data.get('tags', [])
             )
+
             return question, 201
         except ValueError as e:
             questions_namespace.abort(400, str(e))

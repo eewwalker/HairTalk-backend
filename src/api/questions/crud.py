@@ -1,13 +1,26 @@
 from src import db
 # from sqlalchemy.exc import IntegrityError
-from .models import Question, Answer, Comment
+from .models import Question, Answer, Comment, Tag
 from sqlalchemy import desc
 
+def get_or_create_tags(tag_names):
+    tags = []
+    for name in tag_names:
+        tag = Tag.query.filter_by(name=name).first()
+        if not tag:
+            tag = Tag(name=name)
+            db.session.add(tag)
+        tags.append(tag)
+    return tags
 
-def create_question(user_id, title, content, created_at):
+
+def create_question(user_id, title, content, created_at, tag_names=None):
     try:
-        question = Question(user_id=user_id, title=title, content=content,
-                            created_at=created_at)
+        question = Question(user_id=user_id, title=title, content=content)
+        if tag_names:
+            tags = get_or_create_tags(tag_names)
+            question.tags.extend(tags) # Adds the Tags to this Question
+
         db.session.add(question)
         db.session.commit()
         return question
