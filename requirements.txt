@@ -7,4 +7,4 @@ Flask-SQLAlchemy
 psycopg2-binary
 Flask-Bcrypt
 Flask-JWT-Extended
-SQLAlchemy
+sqlalchemy 
