@@ -1,19 +1,7 @@
 from flask import request
-from flask_restx import Namespace, Resource, fields
 from .crud import read_users, read_user, create_user, update_user
-
-users_namespace = Namespace('users')
-
-user_model = users_namespace.model('User',{
-    'id': fields.Integer(readOnly=True),
-    'username': fields.String(required=True, description='Username for user', example="John Doe"),
-    'password': fields.String(required=True, description='Password for user'),
-    'location': fields.String()
-})
-update_user_model = users_namespace.model('User',{
-    'username': fields.String(description='Username for user', example="John Doe"),
-    'location': fields.String()
-})
+from flask_restx import Resource
+from .schemas import user_model, users_namespace, update_user_model
 
 class UserList(Resource):
     @users_namespace.marshal_list_with(user_model)
@@ -75,6 +63,6 @@ class UserResource(Resource):
             # users_namespace.abort(500, str(e))
 
 users_namespace.add_resource(UserList, '/')
-users_namespace.add_resource(UserResource, '/<int:id>')
+users_namespace.add_resource(UserResource, '/<uuid:id>')
 
 
