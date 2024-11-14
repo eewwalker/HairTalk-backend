@@ -2,7 +2,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from src import db
 from datetime import datetime
 
-# Association table for the many-to-many relationship between Question and Tag
+# Association/Join/Through table for the many-to-many relationship between Question and Tag
 question_tags = db.Table('question_tags',
     db.Column('question_id', db.Integer, db.ForeignKey('questions.id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
@@ -20,9 +20,17 @@ class Tag(db.Model):
         unique=True,
         nullable=False
     )
+    # back_populates like backref but more explict and need to add to both models
+    questions = db.relationship('Question',
+                             secondary=question_tags,
+                             back_populates='tags',
+                             lazy='dynamic') #tag may have many questions
 
     def __init__(self, name):
         self.name=name
+
+    def __repr__(self):
+        return f'<Tag {self.name}>'
 
 class Question(db.Model):
     __tablename__ = "questions"
@@ -54,13 +62,24 @@ class Question(db.Model):
         nullable=False
     )
 
-    tags = db.relationship('Tag', secondary=question_tags, backref=db.backref('questions', lazy='dynamic'))
+    @property
+    def tags_list(self):
+        """Return list of tag names"""
+        return [tag.name for tag in self.tags[:5]]
 
-    def __init__(self, user_id, title, content, created_at=None):
+    tags = db.relationship('Tag',
+                        secondary=question_tags,
+                        back_populates='questions')
+
+    def __init__(self, user_id, title, content, tags=None, created_at=None):
         self.user_id = user_id
         self.title = title
         self.content = content
+        self.tags = tags or []
         self.created_at = created_at if created_at else datetime.now()
+
+    def __repr__(self):
+        return f'<Question {self.title}>'
 
 
 class Answer(db.Model):
