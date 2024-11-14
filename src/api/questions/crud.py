@@ -4,26 +4,50 @@ from .models import Question, Answer, Comment, Tag
 from sqlalchemy import desc
 
 def get_or_create_tags(tag_names):
+    """
+    Get existing tags or create new tags
+    Args:
+        tag_names(str[])
+    Returns:
+        list of Tag objs
+    """
     tags = []
     for name in tag_names:
-        tag = Tag.query.filter_by(name=name).first()
-        if not tag:
-            tag = Tag(name=name)
-            db.session.add(tag)
-        tags.append(tag)
+        normalize_name = name.strip().lower()
+        if normalize_name:
+            tag = Tag.query.filter_by(name=normalize_name).first()
+            if not tag:
+                tag = Tag(name=normalize_name)
+                db.session.add(tag)
+            tags.append(tag)
     return tags
 
-
-def create_question(user_id, title, content, created_at, tag_names=None):
+def create_question(user_id, title, content, tag_names=None):
+    """
+    Create a new question with optional tags
+    Args:
+        user_id(UUID), title(str), content(str), tag_names(str[])
+    Returns:
+        question object
+    Raises:
+        ValueError if error creating question
+    """
     try:
+        # Create new question
         question = Question(user_id=user_id, title=title, content=content)
+
+        # Handle tags if submitted
         if tag_names:
-            tags = get_or_create_tags(tag_names)
-            question.tags.extend(tags) # Adds the Tags to this Question
+            # filter out empty strings and duplicates
+            tag_names = list(set(filter(None, tag_names)))
+            if tag_names:
+                tags = get_or_create_tags(tag_names)
+                question.tags.extend(tags) # Adds the Tags to this Question
 
         db.session.add(question)
         db.session.commit()
         return question
+
     except Exception as e:
         db.session.rollback()
         raise ValueError(f"Error creating question: {e}")
