@@ -2,13 +2,32 @@ from flask_restx import Namespace, fields
 
 questions_namespace = Namespace('questions')
 
+tag_model = questions_namespace.model('Tag', {
+    'id': fields.Integer(readOnly=True),
+    'name': fields.String(required=True,
+                          description='Tag name',
+                          example='hair-color')
+})
+
 question_model = questions_namespace.model('Question', {
     'id': fields.Integer(readOnly=True),
-    'title': fields.String(),
-    'userId': fields.String(required=True, attribute='user_id', description='UUID attached to user', example="123e4567-e89b-12d3-a456-426614174000"),
-    'content': fields.String(),
-    'created_at': fields.Date(),
-    'tags': fields.List(fields.String(), description='List of tag names')
+    'title': fields.String(required=True,
+                           description='Question title',
+                           example='How to fix brassy highlights?'),
+    'userId': fields.String(required=True,
+                            attribute='user_id',
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
+    'content': fields.String(required=True,
+                             description='Question content',
+                             example='My highlights are turning brassy...'),
+    'created_at': fields.Date(readOnly=True),
+    'tags': fields.List(fields.String(),
+                        attribute='tags_list',
+                        description='List of tag names',
+                        example=['color-correction', 'highlights'],
+                        required=False,
+                        default=[])
 })
 
 pagination_model = questions_namespace.model('PaginatedQuestion', {
@@ -20,30 +39,42 @@ pagination_model = questions_namespace.model('PaginatedQuestion', {
 
 answer_model_marshal = questions_namespace.model('Answer', {
     'id': fields.Integer(readOnly=True),
-    'userId': fields.String(required=True, description='UUID attached to user', example="123e4567-e89b-12d3-a456-426614174000"),
-    'question_id': fields.Integer(required=True, description='Id of the associated question', example="1"),
+    'userId': fields.String(required=True,
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
+    'question_id': fields.Integer(required=True,
+                                  description='Id of the associated question',
+                                  example="1"),
     'content': fields.String(),
     'created_at': fields.DateTime()
 })
 
 answer_model_validate = questions_namespace.model('Answer', {
     'id': fields.Integer(readOnly=True),
-    'userId': fields.String(required=True, description='UUID attached to user', example="123e4567-e89b-12d3-a456-426614174000"),
+    'userId': fields.String(required=True,
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
     'content': fields.String(),
     'created_at': fields.DateTime()
 })
 
 comment_model_marshal = questions_namespace.model('Comment', {
     'id': fields.Integer(readOnly=True),
-    'userId': fields.String(required=True, description='UUID attached to user', example="123e4567-e89b-12d3-a456-426614174000"),
-    'answer_id': fields.Integer(required=True, description='Id of the associated answer', example="1"),
+    'userId': fields.String(required=True,
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
+    'answer_id': fields.Integer(required=True,
+                                description='Id of the associated answer',
+                                example="1"),
     'content': fields.String(),
     'created_at': fields.DateTime()
 })
 
 comment_model_validate = questions_namespace.model('Comment', {
     'id': fields.Integer(readOnly=True),
-    'userId': fields.String(required=True, description='UUID attached to user', example="123e4567-e89b-12d3-a456-426614174000"),
+    'userId': fields.String(required=True,
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
     'content': fields.String(),
     'created_at': fields.DateTime()
 })
