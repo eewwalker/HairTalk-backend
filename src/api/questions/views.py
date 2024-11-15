@@ -2,14 +2,17 @@ from flask import request
 from flask_restx import Resource, reqparse
 from .crud import (create_question, read_question, read_questions,
                    read_conversation, create_answer, create_comment)
-from .schemas import (questions_namespace, question_model, answer_model_marshal, answer_model_validate,
-                      comment_model_marshal, comment_model_validate, conversation_model, pagination_model)
+from .schemas import (questions_namespace, question_create_model,
+                      question_response_model, answer_model_marshal,
+                      answer_model_validate,
+                      comment_model_marshal, comment_model_validate,
+                      conversation_model, pagination_model)
 from ...utils.uuid_utils import parse_uuid
 class QuestionList(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('page', type=int, default=1, help='Page number')
     parser.add_argument('per_page', type=int,
-                        default=20, help="Items per page")
+                        default=15, help="Items per page")
 
     @questions_namespace.marshal_list_with(pagination_model)
     def get(self):
@@ -20,18 +23,13 @@ class QuestionList(Resource):
         try:
             questions = read_questions(page=page, per_page=per_page)
 
-            return {
-                'items': questions.items,
-                'total': questions.total,
-                'pages': questions.pages,
-                'current_page': questions.page
-            }, 200
+            return questions, 200
 
         except ValueError as e:
             questions_namespace.abort(500, str(e))
 
-    @questions_namespace.expect(question_model, validate=True)
-    @questions_namespace.marshal_with(question_model, code=201)
+    @questions_namespace.expect(question_create_model, validate=True)
+    @questions_namespace.marshal_with(question_response_model, code=201)
     def post(self):
         print("Received request") # Debug log
         try:
@@ -55,7 +53,7 @@ class QuestionList(Resource):
 
 
 class QuestionResource(Resource):
-    @questions_namespace.marshal_with(question_model)
+    @questions_namespace.marshal_with(question_response_model)
     def get(self, id):
         try:
             question = read_question(id)

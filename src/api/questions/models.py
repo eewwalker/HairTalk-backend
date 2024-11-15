@@ -62,14 +62,18 @@ class Question(db.Model):
         nullable=False
     )
 
+    tags = db.relationship('Tag',
+                        secondary=question_tags,
+                        back_populates='questions')
+    user = db.relationship('User',
+                           backref=db.backref('questions', lazy=True))
     @property
     def tags_list(self):
         """Return list of tag names"""
         return [tag.name for tag in self.tags[:5]]
 
-    tags = db.relationship('Tag',
-                        secondary=question_tags,
-                        back_populates='questions')
+    def __repr__(self):
+        return f'<Question {self.title}>'
 
     def __init__(self, user_id, title, content, tags=None, created_at=None):
         self.user_id = user_id
@@ -77,10 +81,6 @@ class Question(db.Model):
         self.content = content
         self.tags = tags or []
         self.created_at = created_at if created_at else datetime.now()
-
-    def __repr__(self):
-        return f'<Question {self.title}>'
-
 
 class Answer(db.Model):
     __tablename__ = "answers"
