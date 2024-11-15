@@ -2,6 +2,7 @@ from src import db
 # from sqlalchemy.exc import IntegrityError
 from .models import Question, Answer, Comment, Tag
 from sqlalchemy import desc
+from ..users.models import User
 
 def get_or_create_tags(tag_names):
     """
@@ -33,6 +34,10 @@ def create_question(user_id, title, content, tag_names=None):
         ValueError if error creating question
     """
     try:
+        user = User.query.get(user_id)
+        if not user:
+            raise ValueError(f"User with id {user_id} does not exist")
+
         # Create new question
         question = Question(user_id=user_id, title=title, content=content)
 
@@ -84,10 +89,31 @@ def read_question(id):
         raise ValueError(f"Error reading question {id}: {e}")
 
 
-def read_questions(page=1, per_page=20):
+def read_questions(page=1, per_page=15):
     try:
-        return Question.query.order_by(desc(Question.created_at)).\
-                        paginate(page=page, per_page=per_page, error_out=False)
+        questions = Question.query\
+            .join(User)\
+            .options(db.joinedload(Question.user))\
+            .order_by(desc(Question.created_at))\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        # return Question.query.order_by(desc(Question.created_at)).\
+        #                 paginate(page=page, per_page=per_page, error_out=False)
+        return {
+            'items': [
+                {
+                    'id': q.id,
+                    'title': q.title,
+                    'content': q.content,
+                    'user_id': str(q.user_id),
+                    'author_username': q.user.username,
+                    'created_at': q.created_at.strftime('%Y-%m-%d'),
+                    'tags': q.tags_list
+                } for q in questions.items
+            ],
+            'total': questions.total,
+            'pages': questions.pages,
+            'current_page': questions.page
+        }
     except Exception as e:
         raise ValueError(f"Error reading questions: {e}")
 
