@@ -9,19 +9,18 @@ tag_model = questions_namespace.model('Tag', {
                           example='hair-color')
 })
 
-question_model = questions_namespace.model('Question', {
-    'id': fields.Integer(readOnly=True),
-    'title': fields.String(required=True,
-                           description='Question title',
-                           example='How to fix brassy highlights?'),
+question_create_model = questions_namespace.model('QuestionCreate', {
+
     'userId': fields.String(required=True,
                             attribute='user_id',
                             description='UUID attached to user',
                             example="123e4567-e89b-12d3-a456-426614174000"),
+    'title': fields.String(required=True,
+                           description='Question title',
+                           example='How to fix brassy highlights?'),
     'content': fields.String(required=True,
                              description='Question content',
                              example='My highlights are turning brassy...'),
-    'created_at': fields.Date(readOnly=True),
     'tags': fields.List(fields.String(),
                         attribute='tags_list',
                         description='List of tag names',
@@ -30,8 +29,29 @@ question_model = questions_namespace.model('Question', {
                         default=[])
 })
 
+question_response_model = questions_namespace.model('QuestionResponse', {
+    'id': fields.Integer(readOnly=True),
+    'title': fields.String(required=True,
+                           description='Question title',
+                           example='How to fix brassy highlights?'),
+    'content': fields.String(required=True,
+                             description='Question content',
+                             example='My highlights are turning brassy...'),
+    'userId': fields.String(required=True,
+                            attribute='user_id',
+                            description='UUID attached to user',
+                            example="123e4567-e89b-12d3-a456-426614174000"),
+    'author_username': fields.String(required=True),
+    'created_at': fields.Date(readOnly=True),
+    'tags': fields.List(fields.String(),
+                        attribute='tags_list',
+                        description='List of tag names',
+                        example=['color-correction', 'highlights'],
+                        required=False)
+})
+
 pagination_model = questions_namespace.model('PaginatedQuestion', {
-    'items': fields.List(fields.Nested(question_model)),
+    'items': fields.List(fields.Nested(question_response_model)),
     'total': fields.Integer,
     'pages': fields.Integer,
     'current_page': fields.Integer
